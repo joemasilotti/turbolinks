@@ -4,11 +4,11 @@
 
 With Turbolinks you get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework. Use HTML to render your views on the server side and link to pages as usual. When you follow a link, Turbolinks automatically fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load.
 
-* graphic *
+_(graphic)_
 
 ## Features
 
-- * good web citizen: works with back, reload automatically *
+- _(good web citizen: works with back, reload automatically)_
 - Optimizes navigation automatically. No need to annotate links or specify which parts of the page should change.
 - No server-side cooperation necessary. Respond with full HTML pages, not fragments.
 - Instant navigation with caching. Recently-visited pages are redisplayed immediately and updated when a fresh response arrives.
@@ -16,92 +16,153 @@ With Turbolinks you get the performance benefits of a single-page application wi
 
 ## Supported Browsers
 
-Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame) and degrades gracefully in their absence. In unsupported browsers, navigation proceeds normally.
+Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame) and degrades gracefully in their absence. In unsupported browsers navigation proceeds normally.
 
-## Installation for Rails Applications
+## Installation
+
+Simply include [`dist/turbolinks.js`](dist/turbolinks.js) in your app's JavaScript bundle.
+
+### Rails Integration
+
+Turbolinks features framework-level integration for Rails applications.
 
 1. Add the `turbolinks` gem, version 5, to your Gemfile: `gem 'turbolinks', '~> 5.0.0.beta'`
 2. Run `bundle install`.
 3. Add `//= require turbolinks` to your JavaScript manifest file (usually found at `app/assets/javascripts/application.js`).
 
-## Using Turbolinks Outside of a Rails Application
 
-Simply include [`dist/turbolinks.js`](dist/turbolinks.js) in your app's JavaScript bundle.
+# Understanding Turbolinks Navigation
 
-# Concepts
+Turbolinks intercepts all clicks on `<a href>` links to the same domain. When an eligible link is clicked, Turbolinks prevents the browser from following it. Instead, Turbolinks changes the browser's URL using the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History), requests the new page using [`XMLHTTPRequest`](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest), and then renders the HTML response.
 
-Turbolinks works by listening for clicks on `<a>` elements referencing an HTML document on the current origin. When an eligible link is clicked, Turbolinks requests its location via XHR, loads the response, merges its `<head>`, and swaps in its `<body>`. Critically, `<script>`, `<style>`, and `<link>` elements in the `<head>` are considered *permanent* and not replaced.
+During rendering, Turbolinks replaces the current `<body>` element outright and merges the contents of the `<head>` element. The JavaScript `window` and `document` objects, and the HTML `<html>` element, persist from one rendering to the next.
 
-Turbolinks is designed to emulate standard browser behavior as closely as possible: location, history, page title, and scroll position all behave exactly as you'd expect.
+## Each Navigation is a Visit
 
-## TODO: Navigating with Turbolinks
+Turbolinks models navigation as a *visit* to a *location* (URL) with an *action*.
 
-Internally, Turbolinks models navigation as a *visit* to a *location* with an *action*. Actions are named for the effect they have on history.
+Visits represent the entire navigation lifecycle from click to load. That includes issuing the network request, restoring a copy of the page from cache, changing browser history, rendering the final response, and updating the scroll position.
 
-_(introduce graphics, split into three paragraphs)_
+There are two types of visit: an _application visit_, which has an action of _advance_ or _replace_, and a _restoration visit_, which has an action of _restore_.
 
-New navigation (e.g. clicking a link) has an action of either *advance* or *replace* and creates or updates a history entry respectively. In both cases Turbolinks will request the given location over the network. If available, a cached version will be shown immediately and updated when the response arrives.
+## Application Visits
 
-History navigation (e.g. clicking the “back” or “forward” buttons in your browser) has an action of *restore*. If available, a cached version of the restored location will be shown immediately and *no* network request will be made to refresh it. Otherwise a request will be performed. In either case, scroll position will be restored.
+Application visits can be initiated by clicking a Turbolinks-enabled link, or programmatically by calling `Turbolinks.visit(location)`.
 
-## TODO: Previews and Caching
+An application visit always issues a network request. When the response arrives, Turbolinks renders its HTML and completes the visit.
 
-Turbolinks caches the 10 most-recently-visited pages in memory for instant display on the next visit. The current page is saved to the cache just prior to it being replaced, ensuring that changes made to the DOM after the initial load will be reflected.
+If possible, Turbolinks will render a preview of the page from cache immediately after the visit starts, while the network request completes in the background. This improves the perceived speed of frequent navigation between the same pages.
 
-_(document cloning)_
+If the visit's location includes an anchor, Turbolinks will attempt to scroll to the anchored element. Otherwise, it will scroll to the top of the page.
 
-Observe the `turbolinks:before-cache` event if you need to make changes or clean up any state before the page is saved.
+Application visits result in a change to the browser's history; the visit's _action_ determines how.
 
-You can clear the page cache at any time by calling `Turbolinks.clearCache()`.
+![Advance visit action](doc/advance.svg)
 
-## TODO: Lifecycle of a Visit
+The default visit action is _advance_. During an advance visit, Turbolinks pushes a new entry onto the browser’s history stack using [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState).
 
-_(timeline graphic)_
+Applications using the Turbolinks iOS adapter typically handle _advance_ visits by pushing a new view controller onto the navigation stack. Similarly, applications using the Android adapter typically push a new activity onto the back stack.
 
-# Basic Usage
+![Replace visit action](doc/replace.svg)
 
-## Specifying a Navigation Action
+Sometimes you may wish to visit a location without pushing a new history entry onto the stack. The _replace_ visit action uses [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) to discard the topmost history entry and replace it with the new location.
 
-The default action when clicking a link is `advance`. To specify that `replace` be used instead, annotate your link with `data-turbolinks-action=replace`.
+To specify that following a link should trigger a _replace_ visit, annotate the link with `data-turbolinks-action=replace`:
 
 ```html
 <a href="/edit" data-turbolinks-action=replace>Edit</a>
 ```
 
-The `restore` action is reserved for internal use during history navigation.
+To programmatically visit a location with the _replace_ action, pass the `action: "replace"` option to `Turbolinks.visit`:
 
-## Navigating Programmatically
-
-To navigate programatically call `Turbolinks.visit` with a *location* and an optional *action*. The action can be either `advance` or `replace`. The default action is `advance`.
-
-```javascript
-// Visit this location and push a new history entry
-Turbolinks.visit("/new")
-Turbolinks.visit("/new", { action: "advance" })
-
-// Replace the current history entry
+```js
 Turbolinks.visit("/edit", { action: "replace" })
 ```
 
-## Handling Significant Events
+Applications using the Turbolinks iOS adapter typically handle _replace_ visits by dismissing the topmost view controller and pushing a new view controller onto the navigation stack without animation.
+
+## Restoration Visits
+
+Turbolinks automatically initiates a restoration visit when you navigate with the browser's Back or Forward buttons. Applications using the iOS or Andriod adapters initiate a restoration visit when moving backward in the navigation stack.
+
+![Restore visit action](doc/restore.svg)
+
+If possible, Turbolinks will render a copy of the page from cache without making a request. Otherwise, it will retrieve a fresh copy of the page over the network.
+
+Turbolinks saves the scroll position of each page before navigating away and automatically returns to this saved position on restoration visits.
+
+Restoration visits are internal and always have an action of _restore_. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
+
+## Disabling Turbolinks on Specific Links
+
+You can disable Turbolinks on a per-link basis by annotating a link or any of its ancestors with `data-turbolinks=false`. To reenable when an ancestor has opted out, use `data-turbolinks=true`.
+
+```html
+<a href="/">Enabled</a>
+<a href="/" data-turbolinks=false>Disabled</a>
+
+<div data-turbolinks=false>
+  <a href="/">Disabled</a>
+  <a href="/" data-turbolinks=true>Enabled</a>
+</div>
+```
+
+Links with Turbolinks disabled will be handled normally by the browser, which usually means they'll result in a full page load.
+
+## Canceling Visits Before They Start
+
+Application visits can be canceled before they start, regardless of whether they were initiated by a link click or a call to `Turbolinks.visit`.
+
+Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
+
+Note that `turbolinks:before-visit` does not fire for restoration visits because history has already been changed by the browser and consequently cannot be canceled.
+
+
+# Building Your Turbolinks Application
+
+## Observing Significant Events
 
 Turbolinks emits several events on `document` that allow you to track the navigation lifecycle and respond to page loading. While an exhaustive list is included later in this document, the following events are noteworthy. You’ll use these the most frequently.
 
-**Event: `turbolinks:load`**
+#### `turbolinks:load`
 **Purpose: Initialize the DOM after the page has changed**
 
 Fired in response to `DOMContentLoaded` on the initial page load and again after every Turbolinks visit, `turbolinks:load` signals that the page has loaded and the DOM is ready. It’s an appropriate time to bind event listeners, initialize behavior, or manipulate elements. Use `turbolinks:load` in place of `DOMContentLoaded` or jQuery’s `$.ready()` which are only fired on a full page load and not after Turbolinks navigation.
 
-**Event: `turbolinks:before-cache`**
+#### `turbolinks:before-cache`
 **Purpose: Clean up the DOM before it’s saved to cache**
 
 Fired just before a snapshot of the current page is saved to the cache, `turbolinks:before-cache` is your opportunity to prepare the DOM for storage and eventual redisplay. Use it to reset form fields, close expandable elements, undo non-idempotent DOM transformations, teardown third-party code, or preserve any required state. Note that you needn’t uninstall event listeners as they’re not copied to the cache.
 
-**Event: `turbolinks:before-visit`**
+#### `turbolinks:before-visit`
 **Purpose: Prevent Turbolinks from visiting a location**
 
 Fired just before Turbolinks visits a location, `turbolinks:before-visit` gives you an opportunity to opt-out of  cancelable navigation before it begins. Access the proposed location via the `Event` object’s `data.url` and if desired, cancel navigation by calling `event.preventDefault()`. Note that `turbolinks:before-visit` does not fire for visits that originate from history. As history has already been changed, these can’t be prevented.
 
+## Previews, Caching, and Clone Safety
+
+Before rendering a new page, Turbolinks clones the current page’s `<body>` and saves it to the snapshot cache. Whenever Turbolinks displays a cached page—either by a restore visit using the Back or Forward buttons, or by showing a preview during an advance visit to an already-visited location—all elements are freshly cloned, which means they have no attached event listeners or associated data.
+
+The benefits of this approach are that it’s simpler to reason about when to register event listeners (no need to distinguish between page “change” and page “load”), and that Turbolinks is less likely to leak memory (because existing event listeners are discarded).
+
+The constraint with this approach is that all DOM manipulation must be idempotent. If you transform the document with JavaScript, you must make sure it’s safe to perform that transformation again, particularly on a cloned copy of the element. In practice, this usually means using a data attribute or some other heuristic to detect when an element has already been processed.
+
+## Designating Permanent Elements
+
+Consider a Turbolinks application with a shopping cart. At the top of each page is an icon with the number of items currently in the cart. This counter is updated dynamically with JavaScript as items are added and removed.
+
+Now imagine a user who has navigated to several pages in this application. She adds an item to her cart, then presses the Back button in her browser. Upon navigation, Turbolinks restores the previous page’s state from cache, and the cart item count erroneously changes from 1 to 0.
+
+To avoid this problem, Turbolinks allows you to mark certain elements as _permanent_. Permanent elements persist across page loads, so that any changes made to those elements do not need to be reapplied after navigation.
+
+Designate permanent elements by giving them an HTML `id` and annotating them with `data-turbolinks-permanent`. Before each render, Turbolinks matches all permanent elements by `id` and transfers them from the original page to the new page, preserving their data and event listeners.
+
+## Handling Dynamic Updates
+
+Prefer using event delegation on `document.documentElement`, `document`, or `window`. Consider using `MutationObserver` to install behavior on elements as they’re added to the page.
+
+
+# Advanced Usage
 
 ## Displaying Progress
 
@@ -132,42 +193,9 @@ Turbolinks can track asset elements in the page `<head>` and reload automaticall
 
 When Turbolinks attempts to load a page whose tracked asset elements differ from those of the current page, it ceases further processing and loads the page in full. Note that when this occurs the page will be requested twice: once when it’s determined that tracked assets have changed, and again when it’s loaded in full.
 
-## Opting Out
+## Setting a Root Location
 
-Turbolinks is automatically enabled for internal links to HTML documents on the same origin. You can opt out of Turbolinks explicitly by annotating a link or any of its ancestors with `data-turbolinks=false`. To reenable when an ancestor has opted out, use `data-turbolinks=true`.
-
-```html
-<a href="/">Enabled</a>
-<a href="/" data-turbolinks=false>Disabled</a>
-
-<div data-turbolinks=false>
-  <a href="/">Disabled</a>
-  <a href="/" data-turbolinks=true>Enabled</a>
-</div>
-```
-
-# TODO: Building Your Turbolinks Application
-
-_(discuss SJR in the context of updating the page; contrast with normal navigation)_
-
-## TODO: Observing Page Loads
-
-- Listen for `turbolinks:load`
-- `turbolinks:load` fires once on the initial page load in response to DOMContentLoaded, and again on every Turbolinks visit, whether it’s triggered by history, a link click, or a call to `Turbolinks.visit()`.
-- Keep track of elements you've already processed by adding a data attribute
-- DOM transformations should be idempotent. It should be safe to apply them at any time.
-
-## TODO: Handling Dynamic Updates
-
-Prefer using event delegation on `document.documentElement`, `document`, or `window`. Consider using `MutationObserver` to install behavior on elements as they’re added to the page.
-
-## Previews, Caching, and Clone Safety
-
-Before rendering a new page, Turbolinks clones the current page’s `<body>` and saves it to the snapshot cache. Whenever Turbolinks displays a cached page—either by a restore visit using the Back or Forward buttons, or by showing a preview during an advance visit to an already-visited location—all elements are freshly cloned, which means they have no attached event listeners or associated data.
-
-The benefits of this approach are that it’s simpler to reason about when to register event listeners (no need to distinguish between page “change” and page “load”), and that Turbolinks is less likely to leak memory (because existing event listeners are discarded).
-
-The constraint with this approach is that all DOM manipulation must be idempotent. If you transform the document with JavaScript, you must make sure it’s safe to perform that transformation again, particularly on a cloned copy of the element. In practice, this usually means using a data attribute or some other heuristic to detect when an element has already been processed.
+TODO
 
 ## Following Redirects
 
@@ -209,27 +237,13 @@ If form submission has resulted in a state change on the server that will affect
 
 If you're using Turbolinks with a Rails application this optimization will happen automatically for non-GET XHR requests that redirect using `redirect_to`.
 
-
-# Advanced Usage
-
-## Designating Permanent Elements
-
-Consider a Turbolinks application with a shopping cart. At the top of each page is an icon with the number of items currently in the cart. This counter is updated dynamically with JavaScript as items are added and removed.
-
-Now imagine a user who has navigated to several pages in this application. She adds an item to her cart, then presses the Back button in her browser. Upon navigation, Turbolinks restores the previous page’s state from cache, and the cart item count erroneously changes from 1 to 0.
-
-To avoid this problem, Turbolinks allows you to mark certain elements as _permanent_. Permanent elements persist across page loads, so that any changes made to those elements do not need to be reapplied after navigation.
-
-Designate permanent elements by giving them an HTML `id` and annotating them with `data-turbolinks-permanent`. Before each render, Turbolinks matches all permanent elements by `id` and transfers them from the original page to the new page, preserving their data and event listeners.
-
-## TODO: Setting a Root Location
-
 ## Full List of Events
 
 Turbolinks emits events that allow you to track the navigation lifecycle and respond to page loading. Except where noted, events are fired on `document`.
 
 - `turbolinks:click` fires when a Turbolinks-enabled link is clicked. The clicked element is the event target. Access the requested location with `event.data.url`. Cancelable.
-- `turbolinks:visit` fires before visiting a location. Does not fire when navigating by history. Access the requested location with `event.data.url`. Cancelable.
+- `turbolinks:before-visit` fires before visiting a location. Does not fire when navigating by history. Access the requested location with `event.data.url`. Cancelable.
+- `turbolinks:visit` fires immediately after a visit starts.
 - `turbolinks:request-start` fires before issuing a network request to fetch a page.
 - `turbolinks:request-end` fires after a network request completes.
 - `turbolinks:before-cache` fires before the current page is saved to the cache.
@@ -237,13 +251,7 @@ Turbolinks emits events that allow you to track the navigation lifecycle and res
 - `turbolinks:render` fires after rendering the page. Fires twice when advancing to a cached location: once after rendering the cached version and again after rendering the fresh version.
 - `turbolinks:load` fires after the page is fully loaded.
 
-# TODO: Differences From Earlier Versions
 
-# Known Issues
-
-- Anchored links to the current location deviate from standard browser behavior by making a network request.
-- Snapshot#hasAnchor() doesn't consider named anchors like `<a name="top"></a>`.
-- Visiting with an unrecognized action triggers an error when history is changed. We should fail sooner when an invalid action is specified.
 
 ---
 
