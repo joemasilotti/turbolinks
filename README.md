@@ -16,7 +16,7 @@ With Turbolinks you get the performance benefits of a single-page application wi
 
 ## Supported Browsers
 
-Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame) and degrades gracefully in their absence. In unsupported browsers navigation proceeds normally.
+Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame) and degrades gracefully in their absence. In unsupported browsers, navigation proceeds normally.
 
 ## Installation for Rails Applications
 
