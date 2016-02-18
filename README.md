@@ -83,13 +83,24 @@ Turbolinks.visit("/new", { action: "advance" })
 Turbolinks.visit("/edit", { action: "replace" })
 ```
 
-## TODO: Handling Significant Events
+## Handling Significant Events
 
-Important events:
+Turbolinks emits several events on `document` that allow you to track the navigation lifecycle and respond to page loading. While an exhaustive list is included later in this document, the following events are noteworthy. You’ll use these the most frequently.
 
-- turbolinks:before-visit
-- turbolinks:before-cache
-- turbolinks:load
+**Event: `turbolinks:load`**
+**Purpose: Initialize the DOM after the page has changed**
+
+Fired in response to `DOMContentLoaded` on the initial page load and again after every Turbolinks visit, `turbolinks:load` signals that the page has loaded and the DOM is ready. It’s an appropriate time to bind event listeners, initialize behavior, or manipulate elements. Use `turbolinks:load` in place of `DOMContentLoaded` or jQuery’s `$.ready()` which are only fired on a full page load and not after Turbolinks navigation.
+
+**Event: `turbolinks:before-cache`**
+**Purpose: Clean up the DOM before it’s saved to cache**
+
+Fired just before a snapshot of the current page is saved to the cache, `turbolinks:before-cache` is your opportunity to prepare the DOM for storage and eventual redisplay. Use it to reset form fields, close expandable elements, undo non-idempotent DOM transformations, teardown third-party code, or preserve any required state. Note that you needn’t uninstall event listeners as they’re not copied to the cache.
+
+**Event: `turbolinks:before-visit`**
+**Purpose: Prevent Turbolinks from visiting a location**
+
+Fired just before Turbolinks visits a location, `turbolinks:before-visit` gives you an opportunity to opt-out of  cancelable navigation before it begins. Access the proposed location via the `Event` object’s `data.url` and if desired, cancel navigation by calling `event.preventDefault()`. Note that `turbolinks:before-visit` does not fire for visits that originate from history. As history has already been changed, these can’t be prevented.
 
 
 ## Displaying Progress
