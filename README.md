@@ -4,7 +4,7 @@
 
 With Turbolinks you get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework. Use HTML to render your views on the server side and link to pages as usual. When you follow a link, Turbolinks automatically fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load.
 
-_(graphic)_
+![Turbolinks](https://s3.amazonaws.com/turbolinks-docs/images/turbolinks.gif)
 
 ## Features
 
@@ -57,13 +57,13 @@ If the visit's location includes an anchor, Turbolinks will attempt to scroll to
 
 Application visits result in a change to the browser's history; the visit's _action_ determines how.
 
-![Advance visit action](doc/advance.svg)
+![Advance visit action](https://s3.amazonaws.com/turbolinks-docs/images/advance.svg)
 
 The default visit action is _advance_. During an advance visit, Turbolinks pushes a new entry onto the browser’s history stack using [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState).
 
 Applications using the Turbolinks iOS adapter typically handle _advance_ visits by pushing a new view controller onto the navigation stack. Similarly, applications using the Android adapter typically push a new activity onto the back stack.
 
-![Replace visit action](doc/replace.svg)
+![Replace visit action](https://s3.amazonaws.com/turbolinks-docs/images/replace.svg)
 
 Sometimes you may wish to visit a location without pushing a new history entry onto the stack. The _replace_ visit action uses [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) to discard the topmost history entry and replace it with the new location.
 
@@ -85,7 +85,7 @@ Applications using the Turbolinks iOS adapter typically handle _replace_ visits 
 
 Turbolinks automatically initiates a restoration visit when you navigate with the browser's Back or Forward buttons. Applications using the iOS or Andriod adapters initiate a restoration visit when moving backward in the navigation stack.
 
-![Restore visit action](doc/restore.svg)
+![Restore visit action](https://s3.amazonaws.com/turbolinks-docs/images/restore.svg)
 
 If possible, Turbolinks will render a copy of the page from cache without making a request. Otherwise, it will retrieve a fresh copy of the page over the network.
 
