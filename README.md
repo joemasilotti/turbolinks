@@ -20,11 +20,11 @@ Turbolinks works in all modern desktop and mobile browsers. It depends on the [H
 
 ## Installation
 
-Simply include [`dist/turbolinks.js`](dist/turbolinks.js) in your app's JavaScript bundle.
+Include [`dist/turbolinks.js`](dist/turbolinks.js) in your application’s JavaScript bundle.
 
 ### Rails Integration
 
-Turbolinks features framework-level integration for Rails applications.
+The Turbolinks gem includes framework-level integration for Rails applications. To install:
 
 1. Add the `turbolinks` gem, version 5, to your Gemfile: `gem 'turbolinks', '~> 5.0.0.beta'`
 2. Run `bundle install`.
