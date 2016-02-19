@@ -165,9 +165,11 @@ Prefer using event delegation on `document.documentElement`, `document`, or `win
 
 ## Displaying Progress
 
-Because Turbolinks navigation proceeds without a full load, the browser's native progress indicator won't be activated. Turbolinks ships with a JavaScript and CSS-based progress bar to compensate.
+Because a Turbolinks visit doesn’t issue a full page load, the browser's native progress indicator won't be activated when you navigate. To compensate, Turbolinks includes a JavaScript and CSS-based progress bar that’s activated automatically.
 
-The progress bar is implemented as a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles are included first in the document head such that they can be overridden by rules that come later. For example, a thick green progress bar:
+The progress bar is implemented as a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles are included first in the document; they can be overridden by rules that come later.
+
+For example, the following will result in a thick green progress bar:
 
 ```css
 .turbolinks-progress-bar {
