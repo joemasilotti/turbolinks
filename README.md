@@ -1,6 +1,6 @@
 # Turbolinks
 
-**Turbolinks makes navigating your web application faster.** In standard navigation the browser loads every page anew. It downloads resources, evaluates JavaScript, and processes CSS. This takes time. But in most web applications these resources don't change between requests. So why spend time reloading them? Turbolinks speeds up navigation by persisting the current page and updating its contents in place.
+**Turbolinks makes navigating your web application faster.** In standard navigation the browser loads every page anew. It downloads resources, evaluates JavaScript, and processes CSS. This takes time. But in most web applications these resources don't change between requests. Turbolinks speeds up navigation by persisting the current page and updating its contents in place.
 
 With Turbolinks you get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework. Use HTML to render your views on the server side and link to pages as usual. When you follow a link, Turbolinks automatically fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load.
 
@@ -8,11 +8,10 @@ With Turbolinks you get the performance benefits of a single-page application wi
 
 ## Features
 
-- _(good web citizen: works with back, reload automatically)_
-- Optimizes navigation automatically. No need to annotate links or specify which parts of the page should change.
-- No server-side cooperation necessary. Respond with full HTML pages, not fragments.
-- Instant navigation with caching. Turbolinks displays recently-visited pages immediately and updates them when a fresh response arrives.
-- Custom adapters allow for precise, fine-grained control of the navigation lifecycle.
+- **Optimizes navigation automatically.** No need to annotate links or specify which parts of the page should change.
+- **No server-side cooperation necessary.** Respond with full HTML pages, not fragments.
+- **Respects the web.** The Back and Reload buttons work just as you’d expect.
+- **Supports mobile apps.** Adapters for iOS and Android let you build hybrid applications using native navigation controls.
 
 ## Supported Browsers
 
