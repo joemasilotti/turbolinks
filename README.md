@@ -91,7 +91,7 @@ If possible, Turbolinks will render a copy of the page from cache without making
 
 Turbolinks saves the scroll position of each page before navigating away and automatically returns to this saved position on restoration visits.
 
-Restoration visits are internal and always have an action of _restore_. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
+Restoration visits have an action of _restore_ and are reserved for internal use. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
 
 ## Canceling Visits Before They Start
 
@@ -99,7 +99,7 @@ Application visits can be canceled before they start, regardless of whether they
 
 Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
 
-Note that `turbolinks:before-visit` does not fire for restoration visits because history has already been changed by the browser and consequently cannot be canceled.
+Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`. Restoration visits are issued in response to history navigation that has *already taken place*, typically via the browser’s Back and Forward buttons, and consequently cannot be prevented.
 
 ## Disabling Turbolinks on Specific Links
 
