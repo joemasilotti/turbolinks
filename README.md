@@ -165,11 +165,11 @@ Designate permanent elements by giving them an HTML `id` and annotating them wit
 
 ## Displaying Progress
 
-Because a Turbolinks visit doesn’t issue a full page load, the browser's native progress indicator won't be activated when you navigate. To compensate, Turbolinks includes a JavaScript and CSS-based progress bar that’s activated automatically.
+Because a Turbolinks visit does not issue a full page load, the browser’s native progress indicator will not be activated. Instead, Turbolinks includes a JavaScript and CSS-based progress bar.
 
 The progress bar is implemented as a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles are included first in the document; they can be overridden by rules that come later.
 
-For example, the following will result in a thick green progress bar:
+For example, the following CSS will result in a thick green progress bar:
 
 ```css
 .turbolinks-progress-bar {
@@ -180,11 +180,9 @@ For example, the following will result in a thick green progress bar:
 
 ## Reloading When Assets Change
 
-When you navigate with Turbolinks, external assets like JavaScript and CSS aren’t reloaded. But let’s say you’ve deployed your application with changes to those assets. How can you ensure Turbolinks is always using their latest versions?
-
 Turbolinks can track asset elements in the page `<head>` and reload automatically when the next navigation reveals them to have changed.
 
-Denote tracked elements with `data-turbolinks-track=reload` and include some value in the asset’s URL to indicate its revision. This could be a version number, a last-modified timestamp, or more commonly, a digest of the asset’s contents, as in the following example.
+Denote tracked assets with `data-turbolinks-track=reload` and include a value in each asset’s URL to indicate its revision. This could be a version number, a last-modified timestamp, or a digest of the asset’s contents, as in the following example.
 
 ```html
 <head>
@@ -194,9 +192,9 @@ Denote tracked elements with `data-turbolinks-track=reload` and include some val
 </head>
 ```
 
-When Turbolinks attempts to load a page whose tracked asset elements differ from those of the current page, it ceases further processing and loads the page in full.
+When Turbolinks renders a page whose tracked assets differ from those of the current page, it ceases further processing and issues a full reload.
 
-Note that when this occurs the page will be requested twice: once when it’s determined that tracked assets have changed, and again when it’s loaded in full.
+Note that when this occurs the page will be requested twice: once when it’s determined that tracked assets have changed, and again when it’s reloaded.
 
 ## Setting a Root Location
 
@@ -204,9 +202,9 @@ TODO
 
 ## Following Redirects
 
-Turbolinks makes requests using `XMLHttpRequest`, and XHR transparently follows redirects. If you visit location A and it redirects to location B, we want B to be reflected in history and the address bar. To make this work requires cooperation from the server. There's no way to tell whether an XHR request was redirected via JavaScript alone.
+Turbolinks makes requests using `XMLHttpRequest`, and XHR transparently follows redirects. If you visit location A and it redirects to location B, B should be reflected in history. This requires cooperation from the server. There’s no way to tell whether an XHR request was redirected from JavaScript alone.
 
-Turbolinks will look for the `Turbolinks-Location` header in response to a visit and use its value to update history and the address bar. Send this header from the server when responding with a page that was arrived at by redirection, and whose location you want reflected.
+Turbolinks will look for the `Turbolinks-Location` header in response to a visit and use it to update history. Send this header from the server when responding with a page that was reached by redirection.
 
 Consider the following Turbolinks visit and abbreviated HTTP conversation.
 
@@ -232,15 +230,11 @@ If you're using Turbolinks with a Rails application `Turbolinks-Location` is set
 
 Submitting an HTML form to the server and redirecting in response is a common pattern in web applications. Standard form submission is similar to navigation, resulting in a full page load. Using Turbolinks you can improve the performance of form submission without complicating your server-side code.
 
-Instead of submitting forms normally, submit them with XHR. In response to an XHR submit on the server, return JavaScript that performs a Turbolinks visit to be evaluated by the browser.
-
-```javascript
-Turbolinks.visit(destination)
-```
+Instead of submitting forms normally, submit them with XHR. In response to an XHR submit on the server, return JavaScript that performs a `Turbolinks.visit` to be evaluated by the browser.
 
 If form submission has resulted in a state change on the server that will affect cached pages, consider clearing Turbolinks’ cache with `Turbolinks.clearCache()`.
 
-If you're using Turbolinks with a Rails application this optimization will happen automatically for non-GET XHR requests that redirect using `redirect_to`.
+If you're using Turbolinks with a Rails application this optimization will happen automatically for non-GET XHR requests that are redirected using the `redirect_to` helper.
 
 ## Full List of Events
 
