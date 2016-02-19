@@ -1,6 +1,6 @@
 # Turbolinks
 
-**Turbolinks makes navigating your web application faster.** In standard browser navigation every page is loaded anew. Resources are downloaded, JavaScript is evaluated, and CSS is processed. This takes time. But in most web applications these resources don't change between requests. So why spend time reloading them? Turbolinks speeds up navigation by persisting the current page and updating its contents in place.
+**Turbolinks makes navigating your web application faster.** In standard navigation the browser loads every page anew. It downloads resources, evaluates JavaScript, and processes CSS. This takes time. But in most web applications these resources don't change between requests. So why spend time reloading them? Turbolinks speeds up navigation by persisting the current page and updating its contents in place.
 
 With Turbolinks you get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework. Use HTML to render your views on the server side and link to pages as usual. When you follow a link, Turbolinks automatically fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load.
 
@@ -11,7 +11,7 @@ With Turbolinks you get the performance benefits of a single-page application wi
 - _(good web citizen: works with back, reload automatically)_
 - Optimizes navigation automatically. No need to annotate links or specify which parts of the page should change.
 - No server-side cooperation necessary. Respond with full HTML pages, not fragments.
-- Instant navigation with caching. Recently-visited pages are redisplayed immediately and updated when a fresh response arrives.
+- Instant navigation with caching. Turbolinks displays recently-visited pages immediately and updates them when a fresh response arrives.
 - Custom adapters allow for precise, fine-grained control of the navigation lifecycle.
 
 ## Supported Browsers
@@ -30,10 +30,9 @@ The Turbolinks gem includes framework-level integration for Rails applications. 
 2. Run `bundle install`.
 3. Add `//= require turbolinks` to your JavaScript manifest file (usually found at `app/assets/javascripts/application.js`).
 
-
 # Understanding Turbolinks Navigation
 
-Turbolinks intercepts all clicks on `<a href>` links to the same domain. When an eligible link is clicked, Turbolinks prevents the browser from following it. Instead, Turbolinks changes the browser's URL using the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History), requests the new page using [`XMLHttpRequest`](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest), and then renders the HTML response.
+Turbolinks intercepts all clicks on `<a href>` links to the same domain. When you click an eligible link, Turbolinks prevents the browser from following it. Instead, Turbolinks changes the browser's URL using the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History), requests the new page using [`XMLHttpRequest`](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest), and then renders the HTML response.
 
 During rendering, Turbolinks replaces the current `<body>` element outright and merges the contents of the `<head>` element. The JavaScript `window` and `document` objects, and the HTML `<html>` element, persist from one rendering to the next.
 
@@ -91,7 +90,7 @@ If possible, Turbolinks will render a copy of the page from cache without making
 
 Turbolinks saves the scroll position of each page before navigating away and automatically returns to this saved position on restoration visits.
 
-Restoration visits have an action of _restore_ and are reserved for internal use. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
+Restoration visits have an action of _restore_ and Turbolinks reserves them for internal use. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
 
 ## Canceling Visits Before They Start
 
@@ -99,7 +98,7 @@ Application visits can be canceled before they start, regardless of whether they
 
 Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
 
-Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`. Restoration visits are issued in response to history navigation that has *already taken place*, typically via the browser’s Back and Forward buttons, and consequently cannot be prevented.
+Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`. Turbolinks issues restoration visits in response to history navigation that has *already taken place*, typically via the browser’s Back or Forward buttons.
 
 ## Disabling Turbolinks on Specific Links
 
@@ -129,7 +128,7 @@ Consider a Turbolinks application with a shopping cart. At the top of each page 
 
 Now imagine a user who has navigated to several pages in this application. She adds an item to her cart, then presses the Back button in her browser. Upon navigation, Turbolinks restores the previous page’s state from cache, and the cart item count erroneously changes from 1 to 0.
 
-To avoid this problem, Turbolinks allows you to mark certain elements as _permanent_. Permanent elements persist across page loads, so that any changes made to those elements do not need to be reapplied after navigation.
+To avoid this problem, Turbolinks allows you to mark certain elements as _permanent_. Permanent elements persist across page loads, so that any changes you make to those elements do not need to be reapplied after navigation.
 
 Designate permanent elements by giving them an HTML `id` and annotating them with `data-turbolinks-permanent`. Before each render, Turbolinks matches all permanent elements by `id` and transfers them from the original page to the new page, preserving their data and event listeners.
 
@@ -145,11 +144,11 @@ Designate permanent elements by giving them an HTML `id` and annotating them wit
 
 ## Displaying Progress
 
-Because a Turbolinks visit does not issue a full page load, the browser’s native progress indicator will not be activated. Instead, Turbolinks includes a JavaScript and CSS-based progress bar.
+During Turbolinks navigation, the browser will not display its native progress indicator. Turbolinks installs a CSS-based progress bar to provide feedback while issuing a request.
 
-The progress bar is implemented as a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles are included first in the document; they can be overridden by rules that come later.
+The Turbolinks progress bar is a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles appear first in the document and can be overridden by rules that come later.
 
-For example, the following CSS will result in a thick green progress bar:
+For example, the following CSS results in a thick green progress bar:
 
 ```css
 .turbolinks-progress-bar {
@@ -160,7 +159,7 @@ For example, the following CSS will result in a thick green progress bar:
 
 ## Reloading When Assets Change
 
-Turbolinks can track asset elements in the page `<head>` and reload automatically when the next navigation reveals them to have changed.
+Turbolinks can track asset elements in `<head>` from one page to the next and automatically issue a full reload if any of the URLs have changed. This ensures that users always have the latest versions of your application’s scripts and styles.
 
 Denote tracked assets with `data-turbolinks-track=reload` and include a value in each asset’s URL to indicate its revision. This could be a version number, a last-modified timestamp, or a digest of the asset’s contents, as in the following example.
 
@@ -172,9 +171,7 @@ Denote tracked assets with `data-turbolinks-track=reload` and include a value in
 </head>
 ```
 
-When Turbolinks renders a page whose tracked assets differ from those of the current page, it ceases further processing and issues a full reload.
-
-Note that when this occurs the page will be requested twice: once when it’s determined that tracked assets have changed, and again when it’s reloaded.
+Turbolinks will only consider annotated asset tags in `<head>` annotated with `data-turbolinks-track=reload` when deciding whether to reload the page.
 
 ## Setting a Root Location
 
@@ -182,53 +179,37 @@ TODO
 
 ## Following Redirects
 
-Turbolinks makes requests using `XMLHttpRequest`, and XHR transparently follows redirects. If you visit location A and it redirects to location B, B should be reflected in history. This requires cooperation from the server. There’s no way to tell whether an XHR request was redirected from JavaScript alone.
+When you visit location “/one” and the server redirects you to location “/two”, you expect the browser’s address bar to display this redirected URL.
 
-Turbolinks will look for the `Turbolinks-Location` header in response to a visit and use it to update history. Send this header from the server when responding with a page that was reached by redirection.
+However, Turbolinks makes requests using `XMLHttpRequest`, which transparently follows redirects. There’s no way for Turbolinks to tell whether a request resulted in a redirect without additional cooperation from the server.
 
-Consider the following Turbolinks visit and abbreviated HTTP conversation.
+To work around this problem, send the `Turbolinks-Location` header in response to a visit, and Turbolinks will replace the browser’s topmost history entry with the value you provide.
 
-```
-Turbolinks.visit("/one")
+The Turbolinks Rails engine sets `Turbolinks-Location` automatically when using `redirect_to` in response to a Turbolinks visit.
 
-> GET /one
-< 302 Moved Temporarily
-< Location: http://localhost/two
-
-> GET /two # XHR follows the redirect
-< 200 OK
-< Turbolinks-Location: http://localhost/two
-
-window.location.pathname # => "/two"
-```
-
-We visit “/one” and are redirected to “/two”, which XHR dutifully follows. The response from “/two” includes a  `Turbolinks-Location` header to inform Turbolinks of the location change. If the header were omitted, `window.location.pathname` would still be “/one”.
-
-If you're using Turbolinks with a Rails application `Turbolinks-Location` is set automatically when using `redirect_to` in response to a Turbolinks visit. Other frameworks are encouraged to provide similar integration.
-
-## Redirecting After a Form is Submitted
+## Redirecting After a Form Submission
 
 Submitting an HTML form to the server and redirecting in response is a common pattern in web applications. Standard form submission is similar to navigation, resulting in a full page load. Using Turbolinks you can improve the performance of form submission without complicating your server-side code.
 
 Instead of submitting forms normally, submit them with XHR. In response to an XHR submit on the server, return JavaScript that performs a `Turbolinks.visit` to be evaluated by the browser.
 
-If form submission has resulted in a state change on the server that will affect cached pages, consider clearing Turbolinks’ cache with `Turbolinks.clearCache()`.
+If form submission results in a state change on the server that affects cached pages, consider clearing Turbolinks’ cache with `Turbolinks.clearCache()`.
 
-If you're using Turbolinks with a Rails application this optimization happens automatically for non-GET XHR requests that are redirected using the `redirect_to` helper.
+The Turbolinks Rails engine performs this optimization automatically for non-GET XHR requests that redirect with the `redirect_to` helper.
 
 ## Full List of Events
 
-Turbolinks emits events that allow you to track the navigation lifecycle and respond to page loading. Except where noted, events are fired on `document`.
+Turbolinks emits events that allow you to track the navigation lifecycle and respond to page loading. Except where noted, Turbolinks fires events on the `document` object.
 
-- `turbolinks:click` fires when a Turbolinks-enabled link is clicked. The clicked element is the event target. Access the requested location with `event.data.url`. Cancelable.
-- `turbolinks:before-visit` fires before visiting a location. Does not fire when navigating by history. Access the requested location with `event.data.url`. Cancelable.
+- `turbolinks:click` fires when you click a Turbolinks-enabled link. The clicked element is the event target. Access the requested location with `event.data.url`. Cancel this event to let the click fall through to the browser as normal navigation.
+- `turbolinks:before-visit` fires before visiting a location, except when navigating by history. Access the requested location with `event.data.url`. Cancel this event to prevent navigation.
 - `turbolinks:visit` fires immediately after a visit starts.
-- `turbolinks:request-start` fires before issuing a network request to fetch a page.
-- `turbolinks:request-end` fires after a network request completes.
-- `turbolinks:before-cache` fires before the current page is saved to the cache.
-- `turbolinks:before-render` fires before rendering the page.
-- `turbolinks:render` fires after rendering the page. Fires twice when advancing to a cached location: once after rendering the cached version and again after rendering the fresh version.
-- `turbolinks:load` fires after the page is fully loaded.
+- `turbolinks:request-start` fires before Turbolinks issues a network request to fetch the page.
+- `turbolinks:request-end` fires after the network request completes.
+- `turbolinks:before-cache` fires before Turbolinks saves the current page to cache.
+- `turbolinks:before-render` fires before rendering the page. Access the new `<body>` element with `event.data.newBody`.
+- `turbolinks:render` fires after Turbolinks renders the page. This event fires twice during an application visit to a cached location: once after rendering the cached version, and again after rendering the fresh version.
+- `turbolinks:load` fires once after the initial page load, and again after every Turbolinks visit. Access visit timing metrics with the `event.data.timing` object.
 
 
 
