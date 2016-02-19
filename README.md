@@ -218,6 +218,7 @@ Turbolinks emits events that allow you to track the navigation lifecycle and res
 # Contributing to Turbolinks
 
 Turbolinks is open-source software, freely distributable under the terms of an [MIT-style license](LICENSE). The [source code is hosted on GitHub](https://github.com/turbolinks/turbolinks).
+Development is sponsored by [Basecamp](https://basecamp.com/).
 
 We welcome contributions in the form of bug reports, pull requests, or thoughtful discussions in the [GitHub issue tracker](https://github.com/turbolinks/turbolinks/issues).
 
