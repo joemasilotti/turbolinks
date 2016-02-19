@@ -155,7 +155,10 @@ Designate permanent elements by giving them an HTML `id` and annotating them wit
 
 ## Handling Dynamic Updates
 
-Prefer using event delegation on `document.documentElement`, `document`, or `window`. Consider using `MutationObserver` to install behavior on elements as they’re added to the page.
+**TODO**
+
+- Prefer using event delegation on `document.documentElement`, `document`, or `window`.
+- Consider using `MutationObserver` to install behavior on elements as they’re added to the page.
 
 
 # Advanced Usage
