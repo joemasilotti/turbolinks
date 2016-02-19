@@ -121,27 +121,7 @@ Links with Turbolinks disabled will be handled normally by the browser, which us
 
 # Building Your Turbolinks Application
 
-## Observing Significant Events
-
-Turbolinks emits several events on `document` that allow you to track the visit lifecycle. While an exhaustive list is included later in this document, the following events are noteworthy. You’ll use these the most frequently.
-
-#### `turbolinks:load`
-**Purpose: Initialize the DOM after the page has changed**
-
-Fired in response to `DOMContentLoaded` on the initial page load and again after every Turbolinks visit, `turbolinks:load` signals that the page has loaded and the DOM is ready. It’s an appropriate time to bind event listeners, initialize behavior, or manipulate elements. Use `turbolinks:load` in place of `DOMContentLoaded` or jQuery’s `$.ready()` which are only fired on a full page load and not after Turbolinks navigation.
-
-#### `turbolinks:before-cache`
-**Purpose: Clean up the DOM before it’s saved to cache**
-
-Fired just before a snapshot of the current page is saved to the cache, `turbolinks:before-cache` is your opportunity to prepare the DOM for storage and eventual redisplay. Use it to reset form fields, close expandable elements, undo non-idempotent DOM transformations, teardown third-party code, or preserve any required state. Note that you needn’t uninstall event listeners as they’re not copied to the cache.
-
 ## Previews, Caching, and Clone Safety
-
-Before rendering a new page, Turbolinks clones the current page’s `<body>` and saves it to the snapshot cache. Whenever Turbolinks displays a cached page—either by a restore visit using the Back or Forward buttons, or by showing a preview during an advance visit to an already-visited location—all elements are freshly cloned, which means they have no attached event listeners or associated data.
-
-The benefits of this approach are that it’s simpler to reason about when to register event listeners (no need to distinguish between page “change” and page “load”), and that Turbolinks is less likely to leak memory (because existing event listeners are discarded).
-
-The constraint with this approach is that all DOM manipulation must be idempotent. If you transform the document with JavaScript, you must make sure it’s safe to perform that transformation again, particularly on a cloned copy of the element. In practice, this usually means using a data attribute or some other heuristic to detect when an element has already been processed.
 
 ## Designating Permanent Elements
 
@@ -234,7 +214,7 @@ Instead of submitting forms normally, submit them with XHR. In response to an XH
 
 If form submission has resulted in a state change on the server that will affect cached pages, consider clearing Turbolinks’ cache with `Turbolinks.clearCache()`.
 
-If you're using Turbolinks with a Rails application this optimization will happen automatically for non-GET XHR requests that are redirected using the `redirect_to` helper.
+If you're using Turbolinks with a Rails application this optimization happens automatically for non-GET XHR requests that are redirected using the `redirect_to` helper.
 
 ## Full List of Events
 
