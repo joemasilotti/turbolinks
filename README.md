@@ -41,17 +41,17 @@ During rendering, Turbolinks replaces the current `<body>` element outright and 
 
 Turbolinks models navigation as a *visit* to a *location* (URL) with an *action*.
 
-Visits represent the entire navigation lifecycle from click to load. That includes issuing the network request, restoring a copy of the page from cache, changing browser history, rendering the final response, and updating the scroll position.
+Visits represent the entire navigation lifecycle from click to render. That includes issuing the network request, restoring a copy of the page from cache, changing browser history, rendering the final response, and updating the scroll position.
 
 There are two types of visit: an _application visit_, which has an action of _advance_ or _replace_, and a _restoration visit_, which has an action of _restore_.
 
 ## Application Visits
 
-Application visits can be initiated by clicking a Turbolinks-enabled link, or programmatically by calling `Turbolinks.visit(location)`.
+Application visits are initiated by clicking a Turbolinks-enabled link, or programmatically by calling `Turbolinks.visit(location)`.
 
 An application visit always issues a network request. When the response arrives, Turbolinks renders its HTML and completes the visit.
 
-If possible, Turbolinks will render a preview of the page from cache immediately after the visit starts, while the network request completes in the background. This improves the perceived speed of frequent navigation between the same pages.
+If possible, Turbolinks renders a preview of the page from cache immediately after the visit starts and replaces it when the network response arrives. This improves the perceived speed of frequent navigation between the same pages.
 
 If the visit's location includes an anchor, Turbolinks will attempt to scroll to the anchored element. Otherwise, it will scroll to the top of the page.
 
@@ -61,25 +61,25 @@ Application visits result in a change to the browser's history; the visit's _act
 
 The default visit action is _advance_. During an advance visit, Turbolinks pushes a new entry onto the browser’s history stack using [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState).
 
-Applications using the Turbolinks iOS adapter typically handle _advance_ visits by pushing a new view controller onto the navigation stack. Similarly, applications using the Android adapter typically push a new activity onto the back stack.
+Applications using the Turbolinks iOS adapter typically handle advance visits by pushing a new view controller onto the navigation stack. Similarly, applications using the Android adapter typically push a new activity onto the back stack.
 
 ![Replace visit action](https://s3.amazonaws.com/turbolinks-docs/images/replace.svg)
 
-Sometimes you may wish to visit a location without pushing a new history entry onto the stack. The _replace_ visit action uses [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) to discard the topmost history entry and replace it with the new location.
+You may wish to visit a location without pushing a new history entry onto the stack. The _replace_ visit action uses [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) to discard the topmost history entry and replace it with the new location.
 
-To specify that following a link should trigger a _replace_ visit, annotate the link with `data-turbolinks-action=replace`:
+To specify that following a link should trigger a replace visit, annotate the link with `data-turbolinks-action=replace`:
 
 ```html
 <a href="/edit" data-turbolinks-action=replace>Edit</a>
 ```
 
-To programmatically visit a location with the _replace_ action, pass the `action: "replace"` option to `Turbolinks.visit`:
+To programmatically visit a location with the replace action, pass the `action: "replace"` option to `Turbolinks.visit`:
 
 ```js
 Turbolinks.visit("/edit", { action: "replace" })
 ```
 
-Applications using the Turbolinks iOS adapter typically handle _replace_ visits by dismissing the topmost view controller and pushing a new view controller onto the navigation stack without animation.
+Applications using the Turbolinks iOS adapter typically handle replace visits by dismissing the topmost view controller and pushing a new view controller onto the navigation stack without animation.
 
 ## Restoration Visits
 
