@@ -103,7 +103,7 @@ Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`.
 
 ## Disabling Turbolinks on Specific Links
 
-You can disable Turbolinks on a per-link basis by annotating a link or any of its ancestors with `data-turbolinks=false`. To reenable when an ancestor has opted out, use `data-turbolinks=true`.
+Turbolinks can be disabled on a per-link basis by annotating a link or any of its ancestors with `data-turbolinks=false`. To reenable when an ancestor has opted out, use `data-turbolinks=true`.
 
 ```html
 <a href="/">Enabled</a>
