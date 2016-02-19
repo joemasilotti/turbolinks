@@ -123,7 +123,7 @@ Links with Turbolinks disabled will be handled normally by the browser, which us
 
 ## Observing Significant Events
 
-Turbolinks emits several events on `document` that allow you to track the navigation lifecycle and respond to page loading. While an exhaustive list is included later in this document, the following events are noteworthy. You’ll use these the most frequently.
+Turbolinks emits several events on `document` that allow you to track the visit lifecycle. While an exhaustive list is included later in this document, the following events are noteworthy. You’ll use these the most frequently.
 
 #### `turbolinks:load`
 **Purpose: Initialize the DOM after the page has changed**
@@ -134,11 +134,6 @@ Fired in response to `DOMContentLoaded` on the initial page load and again after
 **Purpose: Clean up the DOM before it’s saved to cache**
 
 Fired just before a snapshot of the current page is saved to the cache, `turbolinks:before-cache` is your opportunity to prepare the DOM for storage and eventual redisplay. Use it to reset form fields, close expandable elements, undo non-idempotent DOM transformations, teardown third-party code, or preserve any required state. Note that you needn’t uninstall event listeners as they’re not copied to the cache.
-
-#### `turbolinks:before-visit`
-**Purpose: Prevent Turbolinks from visiting a location**
-
-Fired just before Turbolinks visits a location, `turbolinks:before-visit` gives you an opportunity to opt-out of  cancelable navigation before it begins. Access the proposed location via the `Event` object’s `data.url` and if desired, cancel navigation by calling `event.preventDefault()`. Note that `turbolinks:before-visit` does not fire for visits that originate from history. As history has already been changed, these can’t be prevented.
 
 ## Previews, Caching, and Clone Safety
 
