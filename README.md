@@ -93,6 +93,14 @@ Turbolinks saves the scroll position of each page before navigating away and aut
 
 Restoration visits are internal and always have an action of _restore_. You should not attempt to annotate links or invoke `Turbolinks.visit` with an action of `restore`.
 
+## Canceling Visits Before They Start
+
+Application visits can be canceled before they start, regardless of whether they were initiated by a link click or a call to `Turbolinks.visit`.
+
+Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
+
+Note that `turbolinks:before-visit` does not fire for restoration visits because history has already been changed by the browser and consequently cannot be canceled.
+
 ## Disabling Turbolinks on Specific Links
 
 You can disable Turbolinks on a per-link basis by annotating a link or any of its ancestors with `data-turbolinks=false`. To reenable when an ancestor has opted out, use `data-turbolinks=true`.
@@ -108,15 +116,6 @@ You can disable Turbolinks on a per-link basis by annotating a link or any of it
 ```
 
 Links with Turbolinks disabled will be handled normally by the browser, which usually means they'll result in a full page load.
-
-## Canceling Visits Before They Start
-
-Application visits can be canceled before they start, regardless of whether they were initiated by a link click or a call to `Turbolinks.visit`.
-
-Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
-
-Note that `turbolinks:before-visit` does not fire for restoration visits because history has already been changed by the browser and consequently cannot be canceled.
-
 
 # Building Your Turbolinks Application
 
