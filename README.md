@@ -1,8 +1,6 @@
 # Turbolinks
 
-**Turbolinks makes navigating your web application faster.** In standard navigation the browser loads every page anew. It downloads resources, evaluates JavaScript, and processes CSS. This takes time. But in most web applications these resources don't change between requests. Turbolinks speeds up navigation by persisting the current page and updating its contents in place.
-
-With Turbolinks you get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework. Use HTML to render your views on the server side and link to pages as usual. When you follow a link, Turbolinks automatically fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load.
+**Turbolinks makes navigating your web application faster.** When you follow a link, Turbolinks updates the browser's history, fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load. You get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework.
 
 ![Turbolinks](https://s3.amazonaws.com/turbolinks-docs/images/turbolinks.gif)
 
@@ -15,7 +13,7 @@ With Turbolinks you get the performance benefits of a single-page application wi
 
 ## Supported Browsers
 
-Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame) and gracefully degrades to standard navigation in their absence.
+Turbolinks works in all modern desktop and mobile browsers. It depends on the [HTML5 History API](http://caniuse.com/#search=pushState) and [Window.requestAnimationFrame](http://caniuse.com/#search=requestAnimationFrame). In unsupported browsers, Turbolinks gracefully degrades to standard navigation.
 
 ## Installation
 
@@ -23,7 +21,7 @@ Include [`dist/turbolinks.js`](dist/turbolinks.js) in your application’s JavaS
 
 ### Rails Integration
 
-The Turbolinks gem includes framework-level integration for Rails applications. To install:
+The Turbolinks gem is packaged as a Rails engine and integrates seamlessly with the Rails asset pipeline. To install:
 
 1. Add the `turbolinks` gem, version 5, to your Gemfile: `gem 'turbolinks', '~> 5.0.0.beta'`
 2. Run `bundle install`.
@@ -39,7 +37,7 @@ During rendering, Turbolinks replaces the current `<body>` element outright and 
 
 Turbolinks models navigation as a *visit* to a *location* (URL) with an *action*.
 
-Visits represent the entire navigation lifecycle from click to render. That includes issuing the network request, restoring a copy of the page from cache, changing browser history, rendering the final response, and updating the scroll position.
+Visits represent the entire navigation lifecycle from click to render. That includes changing browser history, issuing the network request, restoring a copy of the page from cache, rendering the final response, and updating the scroll position.
 
 There are two types of visit: an _application visit_, which has an action of _advance_ or _replace_, and a _restoration visit_, which has an action of _restore_.
 
@@ -49,7 +47,7 @@ Application visits are initiated by clicking a Turbolinks-enabled link, or progr
 
 An application visit always issues a network request. When the response arrives, Turbolinks renders its HTML and completes the visit.
 
-If possible, Turbolinks renders a preview of the page from cache immediately after the visit starts and replaces it when the network response arrives. This improves the perceived speed of frequent navigation between the same pages.
+If possible, Turbolinks will render a preview of the page from cache immediately after the visit starts. This improves the perceived speed of frequent navigation between the same pages.
 
 If the visit's location includes an anchor, Turbolinks will attempt to scroll to the anchored element. Otherwise, it will scroll to the top of the page.
 
@@ -101,21 +99,25 @@ Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`.
 
 ## Disabling Turbolinks on Specific Links
 
-Turbolinks can be disabled on a per-link basis by annotating a link or any of its parent elements with `data-turbolinks=false`.
-
-To reenable Turbolinks when a parent element has disabled it, use `data-turbolinks=true`.
+Turbolinks can be disabled on a per-link basis by annotating a link or any of its ancestors with `data-turbolinks=false`.
 
 ```html
-<a href="/">Enabled</a>
 <a href="/" data-turbolinks=false>Disabled</a>
 
 <div data-turbolinks=false>
   <a href="/">Disabled</a>
+</div>
+```
+
+To reenable when an ancestor has opted out, use `data-turbolinks=true`:
+
+```html
+<div data-turbolinks=false>
   <a href="/" data-turbolinks=true>Enabled</a>
 </div>
 ```
 
-Links with Turbolinks disabled will be handled normally by the browser, which usually means they'll result in a full page load.
+Links with Turbolinks disabled will be handled normally by the browser.
 
 # Building Your Turbolinks Application
 
@@ -145,9 +147,11 @@ Designate permanent elements by giving them an HTML `id` and annotating them wit
 
 During Turbolinks navigation, the browser will not display its native progress indicator. Turbolinks installs a CSS-based progress bar to provide feedback while issuing a request.
 
-The Turbolinks progress bar is a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles appear first in the document and can be overridden by rules that come later.
+The progress bar is enabled by default. It appears automatically for any page that takes longer than 500ms to load.
 
-For example, the following CSS results in a thick green progress bar:
+The progress bar is a `<div>` element with the class name `turbolinks-progress-bar`. Its default styles appear first in the document and can be overridden by rules that come later.
+
+For example, the following CSS will result in a thick green progress bar:
 
 ```css
 .turbolinks-progress-bar {
@@ -156,11 +160,12 @@ For example, the following CSS results in a thick green progress bar:
 }
 ```
 
+
 ## Reloading When Assets Change
 
-Turbolinks can track asset elements in `<head>` from one page to the next and automatically issue a full reload if any of the URLs have changed. This ensures that users always have the latest versions of your application’s scripts and styles.
+Turbolinks can track the URLs of asset elements in `<head>` from one page to the next, and automatically issue a full reload if they change. This ensures that users always have the latest versions of your application’s scripts and styles.
 
-Denote tracked assets with `data-turbolinks-track=reload` and include a value in each asset’s URL to indicate its revision. This could be a version number, a last-modified timestamp, or a digest of the asset’s contents, as in the following example.
+Annotate asset elements with `data-turbolinks-track=reload` and include a version identifier in your asset URLs. The identifier could be a number, a last-modified timestamp, or better, a digest of the asset's contents as in the following example.
 
 ```html
 <head>
@@ -170,7 +175,7 @@ Denote tracked assets with `data-turbolinks-track=reload` and include a value in
 </head>
 ```
 
-Turbolinks will only consider annotated asset tags in `<head>` annotated with `data-turbolinks-track=reload` when deciding whether to reload the page.
+Note that Turbolinks will only consider tracked assets in `<head>` and not elsewhere on the page.
 
 ## Setting a Root Location
 
@@ -178,11 +183,11 @@ TODO
 
 ## Following Redirects
 
-When you visit location “/one” and the server redirects you to location “/two”, you expect the browser’s address bar to display this redirected URL.
+When you visit location “/one” and the server redirects you to location “/two”, you expect the browser’s address bar to display the redirected URL.
 
 However, Turbolinks makes requests using `XMLHttpRequest`, which transparently follows redirects. There’s no way for Turbolinks to tell whether a request resulted in a redirect without additional cooperation from the server.
 
-To work around this problem, send the `Turbolinks-Location` header in response to a visit, and Turbolinks will replace the browser’s topmost history entry with the value you provide.
+To work around this problem, send the `Turbolinks-Location` header in response to a visit that was redirected, and Turbolinks will replace the browser’s topmost history entry with the value you provide.
 
 The Turbolinks Rails engine sets `Turbolinks-Location` automatically when using `redirect_to` in response to a Turbolinks visit.
 
