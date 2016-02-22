@@ -121,7 +121,59 @@ Links with Turbolinks disabled will be handled normally by the browser.
 
 # Building Your Turbolinks Application
 
-## Previews, Caching, and Clone Safety
+Turbolinks is fast because it doesn't reload the page when you follow a link. Instead, your application becomes a persistent, long-running process in the browser. This requires you to rethink the way you structure your JavaScript.
+
+In particular, you can no longer depend on a full page load to reset your environment every time you navigate. The JavaScript `window` and `document` objects retain their state across page changes, and any other objects you leave in memory will stay in memory.
+
+With awareness and a little extra care, you can design your application to gracefully handle this constraint without tightly coupling it to Turbolinks.
+
+## Running JavaScript When a Page Loads
+
+You may be used to installing JavaScript behavior in response to the `window.onload`, `DOMContentLoaded`, or jQuery `ready` events. With Turbolinks, these events will fire only in response to the initial page load—not after any subsequent page changes.
+
+In many cases, you can simply adjust your code to listen for the `turbolinks:load` event instead, which fires once on the initial page load, and again after every Turbolinks visit.
+
+```js
+document.addEventListener("turbolinks:load", function() {
+  // ...
+})
+```
+
+When possible, use event delegation to ...
+
+## Understanding Caching
+
+Turbolinks maintains a cache of recently visited pages. This cache serves two purposes: to display pages without accessing the network during restoration visits, and to improve perceived performance by showing temporary previews during application visits.
+
+When navigating by history (via a restoration visit), Turbolinks will restore the page from cache without loading a fresh copy from the network, if possible.
+
+Otherwise, during standard navigation (via an application visit), Turbolinks will immediately restore the page from cache and display it as a preview while simultaneously loading a fresh copy from the network. This gives the illusion of instantaneous page loads for frequently accessed locations.
+
+Turbolinks saves a copy of the current page to its cache immediately before rendering a new page. Note that Turbolinks copies the page using [`cloneNode(true)`](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode), which means any attached event listeners and associated data are discarded.
+
+Listen for the `turbolinks:before-cache` event if you need to prepare the document before Turbolinks caches it. You can use this event to reset forms, collapse expanded UI elements, or tear down any third-party widgets so the page is ready to be displayed again.
+
+```js
+document.addEventListener("turbolinks:before-cache", function() {
+  // ...
+})
+```
+
+## Making Transformations Idempotent
+
+- If your page is being rendered from cache, transformations may have already been applied
+- On the next turbolinks:load event, you want to avoid processing elements twice
+- Keep state in the DOM (e.g. using data attributes) when elements have been processed, and check for that in your processing function
+
+## Responding to Page Updates
+
+Turbolinks may not be the only source of page updates. New HTML can appear at any time from Ajax requests, WebSocket connections, or other client-side rendering operations, and this content will need to be initialized as if it came from a fresh page load.
+
+- Use MutationObserver or custom elements for precise lifecycle callbacks
+- Perform transformations and attach behavior when elements are added to the page
+- Remove behavior when elements are removed from the page
+- Benefit: your application is decoupled from Turbolinks
+
 
 ## Designating Permanent Elements
 
