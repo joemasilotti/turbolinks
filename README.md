@@ -131,7 +131,7 @@ With awareness and a little extra care, you can design your application to grace
 
 You may be used to installing JavaScript behavior in response to the `window.onload`, `DOMContentLoaded`, or jQuery `ready` events. With Turbolinks, these events will fire only in response to the initial page load—not after any subsequent page changes.
 
-In many cases, you can simply adjust your code to listen for the `turbolinks:load` event instead, which fires once on the initial page load, and again after every Turbolinks visit.
+In many cases, you can simply adjust your code to listen for the `turbolinks:load` event, which fires once on the initial page load and again after every Turbolinks visit.
 
 ```js
 document.addEventListener("turbolinks:load", function() {
@@ -139,7 +139,7 @@ document.addEventListener("turbolinks:load", function() {
 })
 ```
 
-When possible, use event delegation to ...
+When possible, avoid using the `turbolinks:load` event to add event listeners directly to elements on the page body. Instead, consider using [event delegation](https://learn.jquery.com/events/event-delegation/) to register event listeners once on `document` or `window`.
 
 ## Understanding Caching
 
