@@ -1,6 +1,6 @@
 # Turbolinks
 
-**Turbolinks makes navigating your web application faster.** When you follow a link, Turbolinks updates the browser's history, fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load. You get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework.
+**Turbolinks makes navigating your web application faster.** When you follow a link, Turbolinks updates the browser’s history, fetches the page, swaps in its `<body>`, and merges its `<head>`, all without incurring the cost of a full page load. You get the performance benefits of a single-page application without the added complexity of a client-side JavaScript framework.
 
 ![Turbolinks](https://s3.amazonaws.com/turbolinks-docs/images/turbolinks.gif)
 
@@ -29,7 +29,7 @@ The Turbolinks gem is packaged as a Rails engine and integrates seamlessly with 
 
 # Understanding Turbolinks Navigation
 
-Turbolinks intercepts all clicks on `<a href>` links to the same domain. When you click an eligible link, Turbolinks prevents the browser from following it. Instead, Turbolinks changes the browser's URL using the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History), requests the new page using [`XMLHttpRequest`](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest), and then renders the HTML response.
+Turbolinks intercepts all clicks on `<a href>` links to the same domain. When you click an eligible link, Turbolinks prevents the browser from following it. Instead, Turbolinks changes the browser’s URL using the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History), requests the new page using [`XMLHttpRequest`](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest), and then renders the HTML response.
 
 During rendering, Turbolinks replaces the current `<body>` element outright and merges the contents of the `<head>` element. The JavaScript `window` and `document` objects, and the HTML `<html>` element, persist from one rendering to the next.
 
@@ -49,9 +49,9 @@ An application visit always issues a network request. When the response arrives,
 
 If possible, Turbolinks will render a preview of the page from cache immediately after the visit starts. This improves the perceived speed of frequent navigation between the same pages.
 
-If the visit's location includes an anchor, Turbolinks will attempt to scroll to the anchored element. Otherwise, it will scroll to the top of the page.
+If the visit’s location includes an anchor, Turbolinks will attempt to scroll to the anchored element. Otherwise, it will scroll to the top of the page.
 
-Application visits result in a change to the browser's history; the visit's _action_ determines how.
+Application visits result in a change to the browser’s history; the visit’s _action_ determines how.
 
 ![Advance visit action](https://s3.amazonaws.com/turbolinks-docs/images/advance.svg)
 
@@ -79,7 +79,7 @@ Applications using the Turbolinks iOS adapter typically handle replace visits by
 
 ## Restoration Visits
 
-Turbolinks automatically initiates a restoration visit when you navigate with the browser's Back or Forward buttons. Applications using the iOS or Andriod adapters initiate a restoration visit when moving backward in the navigation stack.
+Turbolinks automatically initiates a restoration visit when you navigate with the browser’s Back or Forward buttons. Applications using the iOS or Andriod adapters initiate a restoration visit when moving backward in the navigation stack.
 
 ![Restore visit action](https://s3.amazonaws.com/turbolinks-docs/images/restore.svg)
 
@@ -93,7 +93,7 @@ Restoration visits have an action of _restore_ and Turbolinks reserves them for 
 
 Application visits can be canceled before they start, regardless of whether they were initiated by a link click or a call to `Turbolinks.visit`.
 
-Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit's location. Then cancel the visit by calling `event.preventDefault()`.
+Listen for the `turbolinks:before-visit` event to be notified when a visit is about to start, and use `event.data.url` (or `$event.originalEvent.data.url`, when using jQuery) to check the visit’s location. Then cancel the visit by calling `event.preventDefault()`.
 
 Restoration visits cannot be canceled and do not fire `turbolinks:before-visit`. Turbolinks issues restoration visits in response to history navigation that has *already taken place*, typically via the browser’s Back or Forward buttons.
 
@@ -121,7 +121,7 @@ Links with Turbolinks disabled will be handled normally by the browser.
 
 # Building Your Turbolinks Application
 
-Turbolinks is fast because it doesn't reload the page when you follow a link. Instead, your application becomes a persistent, long-running process in the browser. This requires you to rethink the way you structure your JavaScript.
+Turbolinks is fast because it doesn’t reload the page when you follow a link. Instead, your application becomes a persistent, long-running process in the browser. This requires you to rethink the way you structure your JavaScript.
 
 In particular, you can no longer depend on a full page load to reset your environment every time you navigate. The JavaScript `window` and `document` objects retain their state across page changes, and any other objects you leave in memory will stay in memory.
 
@@ -217,7 +217,7 @@ For example, the following CSS will result in a thick green progress bar:
 
 Turbolinks can track the URLs of asset elements in `<head>` from one page to the next, and automatically issue a full reload if they change. This ensures that users always have the latest versions of your application’s scripts and styles.
 
-Annotate asset elements with `data-turbolinks-track=reload` and include a version identifier in your asset URLs. The identifier could be a number, a last-modified timestamp, or better, a digest of the asset's contents as in the following example.
+Annotate asset elements with `data-turbolinks-track=reload` and include a version identifier in your asset URLs. The identifier could be a number, a last-modified timestamp, or better, a digest of the asset’s contents as in the following example.
 
 ```html
 <head>
