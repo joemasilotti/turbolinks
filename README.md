@@ -7,8 +7,8 @@
 ## Features
 
 - **Optimizes navigation automatically.** No need to annotate links or specify which parts of the page should change.
-- **No server-side cooperation necessary.** Respond with full HTML pages, not fragments.
-- **Respects the web.** The Back and Reload buttons work just as you’d expect.
+- **No server-side cooperation necessary.** Respond with full HTML pages, not partial page fragments or JSON.
+- **Respects the web.** The Back and Reload buttons work just as you’d expect. Search engine-friendly by design.
 - **Supports mobile apps.** Adapters for iOS and Android let you build hybrid applications using native navigation controls.
 
 ## Supported Browsers
