@@ -83,7 +83,7 @@ Turbolinks automatically initiates a restoration visit when you navigate with th
 
 ![Restore visit action](https://s3.amazonaws.com/turbolinks-docs/images/restore.svg)
 
-If possible, Turbolinks will render a copy of the page from cache without making a request. Otherwise, it will retrieve a fresh copy of the page over the network.
+If possible, Turbolinks will render a copy of the page from cache without making a request. Otherwise, it will retrieve a fresh copy of the page over the network. See [Understanding Caching](#understanding-caching) for more details.
 
 Turbolinks saves the scroll position of each page before navigating away and automatically returns to this saved position on restoration visits.
 
@@ -145,9 +145,9 @@ When possible, use event delegation to ...
 
 Turbolinks maintains a cache of recently visited pages. This cache serves two purposes: to display pages without accessing the network during restoration visits, and to improve perceived performance by showing temporary previews during application visits.
 
-When navigating by history (via a restoration visit), Turbolinks will restore the page from cache without loading a fresh copy from the network, if possible.
+When navigating by history (via [Restoration Visits](#restoration-visits)), Turbolinks will restore the page from cache without loading a fresh copy from the network, if possible.
 
-Otherwise, during standard navigation (via an application visit), Turbolinks will immediately restore the page from cache and display it as a preview while simultaneously loading a fresh copy from the network. This gives the illusion of instantaneous page loads for frequently accessed locations.
+Otherwise, during standard navigation (via [Application Visits](#application-visits)), Turbolinks will immediately restore the page from cache and display it as a preview while simultaneously loading a fresh copy from the network. This gives the illusion of instantaneous page loads for frequently accessed locations.
 
 Turbolinks saves a copy of the current page to its cache immediately before rendering a new page. Note that Turbolinks copies the page using [`cloneNode(true)`](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode), which means any attached event listeners and associated data are discarded.
 
